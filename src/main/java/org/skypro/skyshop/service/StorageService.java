@@ -36,18 +36,38 @@ public class StorageService {
     }
 
     private void initializeTestData() {
-        productMap.put(UUID.randomUUID(), new SimpleProduct("Apple", UUID.randomUUID(), 100));
-        productMap.put(UUID.randomUUID(), new SimpleProduct("Banana", UUID.randomUUID(), 200));
-        productMap.put(UUID.randomUUID(), new DiscountedProduct("Orange", UUID.randomUUID(),250, 50));
-        productMap.put(UUID.randomUUID(), new SimpleProduct("Oreo", UUID.randomUUID(), 245));
-        productMap.put(UUID.randomUUID(), new DiscountedProduct("Grape", UUID.randomUUID(),300, 25));
-        productMap.put(UUID.randomUUID(), new FixPriceProduct("Strawberry", UUID.randomUUID()));
-        productMap.put(UUID.randomUUID(), new SimpleProduct("MAD", UUID.randomUUID(), 1200));
-        productMap.put(UUID.randomUUID(), new FixPriceProduct("New York Times", UUID.randomUUID()));
-        productMap.put(UUID.randomUUID(), new DiscountedProduct("Jacobs Monarch", UUID.randomUUID(), 580, 30));
+        UUID id1 = UUID.randomUUID();
+        productMap.put(id1, new SimpleProduct("Apple", id1, 100));
 
-        articleMap.put(UUID.randomUUID(), new Article("Alligators", "Alligators are large, crocodile-like...", UUID.randomUUID()));
-        articleMap.put(UUID.randomUUID(), new Article("Morning warm-up", "1. Stretching and circular movements...", UUID.randomUUID()));
+        UUID id2 = UUID.randomUUID();
+        productMap.put(id2, new SimpleProduct("Banana", id2, 200));
+
+        UUID id3 = UUID.randomUUID();
+        productMap.put(id3, new DiscountedProduct("Orange", id3, 250, 50));
+
+        UUID id4 = UUID.randomUUID();
+        productMap.put(id4, new SimpleProduct("Oreo", id4, 245));
+
+        UUID id5 = UUID.randomUUID();
+        productMap.put(id5, new DiscountedProduct("Grape", id5, 300, 25));
+
+        UUID id6 = UUID.randomUUID();
+        productMap.put(id6, new FixPriceProduct("Strawberry", id6));
+
+        UUID id7 = UUID.randomUUID();
+        productMap.put(id7, new SimpleProduct("MAD", id7, 1200));
+
+        UUID id8 = UUID.randomUUID();
+        productMap.put(id8, new FixPriceProduct("New York Times", id8));
+
+        UUID id9 = UUID.randomUUID();
+        productMap.put(id9, new DiscountedProduct("Jacobs Monarch", id9, 580, 30));
+
+        UUID articleId1 = UUID.randomUUID();
+        articleMap.put(articleId1, new Article("Alligators", "Alligators are large, crocodile-like...", articleId1));
+
+        UUID articleId2 = UUID.randomUUID();
+        articleMap.put(articleId2, new Article("Morning warm-up", "1. Stretching and circular movements...", articleId2));
     }
 
     public List<Searchable> getAllSearchable() {

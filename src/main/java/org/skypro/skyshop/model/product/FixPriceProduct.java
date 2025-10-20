@@ -25,14 +25,4 @@ public class FixPriceProduct extends Product {
         return true;
     }
 
-    @Override
-    public String getSearchTerm() {
-        return toString();
-    }
-
-    @Override
-    public String getBaseName() {
-        return getName();
-    }
-
 }

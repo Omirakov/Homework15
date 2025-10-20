@@ -23,10 +23,6 @@ public abstract class Product implements Searchable {
         return name;
     }
 
-    public String getBaseName() {
-        return name;
-    }
-
     public abstract int getPrice();
 
     public abstract boolean isSpecial();
@@ -34,7 +30,7 @@ public abstract class Product implements Searchable {
     @JsonIgnore
     @Override
     public String getSearchTerm() {
-        return getName();
+        return getName() + " " + getPrice();
     }
 
     @Override
@@ -49,13 +45,13 @@ public abstract class Product implements Searchable {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof Product product)) return false;
-        return Objects.equals(name, product.name);
+        return Objects.equals(id, product.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(name);
+        return Objects.hash(id);
     }
-
 }
