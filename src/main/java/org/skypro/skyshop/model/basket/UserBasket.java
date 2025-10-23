@@ -13,7 +13,14 @@ public class UserBasket {
     }
 
     private int calculateTotalPrice() {
-        return items.stream().mapToInt(item -> item.getProduct().getPrice() * item.getCount()).sum();
+        return (int) items.stream().mapToDouble(item -> item.getProduct().getPrice() * item.getCount()).sum();
     }
 
+    public List<BasketItem> getItems() {
+        return items;
+    }
+
+    public int getTotal() {
+        return total;
+    }
 }

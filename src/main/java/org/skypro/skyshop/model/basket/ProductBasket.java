@@ -1,10 +1,14 @@
 package org.skypro.skyshop.model.basket;
 
-import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.*;
 
-@Service
+@Component
+@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class ProductBasket {
 
     private final Map<UUID, Integer> basket = new HashMap<>();
@@ -17,7 +21,7 @@ public class ProductBasket {
     }
 
     public void addProduct(UUID id) {
-        basket.put(id, 1);
+        basket.merge(id, 1, Integer::sum);
     }
 
     public void printBasket() {
