@@ -37,11 +37,7 @@ public class ShopController {
 
     @GetMapping("/search")
     public List<SearchResult> search(@RequestParam String pattern) {
-        if (pattern == null || pattern.trim().isEmpty()) {
-            return Collections.emptyList();
-        }
-        return Optional.ofNullable(searchService.search(pattern))
-                .orElse(Collections.emptyList());
+        return Optional.ofNullable(searchService.search(pattern)).orElse(Collections.emptyList());
     }
 }
 

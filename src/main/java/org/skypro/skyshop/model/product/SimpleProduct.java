@@ -15,11 +15,6 @@ public class SimpleProduct extends Product {
     }
 
     @Override
-    public String getName() {
-        return super.getName();
-    }
-
-    @Override
     public int getPrice() {
         return price;
     }
@@ -32,16 +27,6 @@ public class SimpleProduct extends Product {
     @Override
     public boolean isSpecial() {
         return false;
-    }
-
-    @Override
-    public String getSearchTerm() {
-        return toString();
-    }
-
-    @Override
-    public String getBaseName() {
-        return getName();
     }
 
 }

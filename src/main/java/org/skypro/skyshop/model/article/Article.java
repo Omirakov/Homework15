@@ -18,6 +18,17 @@ public class Article implements Searchable {
         this.id = id;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public UUID getId() {
+        return id;
+    }
 
     @JsonIgnore
     @Override
@@ -36,19 +47,19 @@ public class Article implements Searchable {
     }
 
     @Override
-    public UUID getId() {
-        return id;
-    }
-
-    @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (!(o instanceof Article article)) return false;
-        return Objects.equals(title, article.title);
+        return Objects.equals(id, article.id) && Objects.equals(title, article.title) && Objects.equals(text, article.text);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(title);
+        return Objects.hash(id, title, text);
     }
 
+    @Override
+    public String toString() {
+        return "Article{" + "title='" + title + '\'' + ", text='" + text + '\'' + ", id=" + id + '}';
+    }
 }
