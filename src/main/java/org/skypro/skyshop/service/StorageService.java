@@ -15,16 +15,19 @@ public class StorageService {
 
     private final Map<UUID, Product> productMap;
     private final Map<UUID, Article> articleMap;
+    private final Map<UUID, Product> availableProducts;
 
     public StorageService() {
         this.productMap = new HashMap<>();
         this.articleMap = new HashMap<>();
+        this.availableProducts = new HashMap<>();
         initializeTestData();
     }
 
-    public StorageService(Map<UUID, Product> productMap, Map<UUID, Article> articleMap) {
+    public StorageService(Map<UUID, Product> productMap, Map<UUID, Article> articleMap, Map<UUID, Product> availableProducts) {
         this.productMap = productMap;
         this.articleMap = articleMap;
+        this.availableProducts = availableProducts;
     }
 
     public Map<UUID, Product> getProductMap() {
@@ -37,31 +40,49 @@ public class StorageService {
 
     private void initializeTestData() {
         UUID id1 = UUID.randomUUID();
-        productMap.put(id1, new SimpleProduct("Apple", id1, 100));
+        Product apple = new SimpleProduct("Apple", id1, 100);
+        productMap.put(id1, apple);
+        availableProducts.put(id1, apple);
 
         UUID id2 = UUID.randomUUID();
-        productMap.put(id2, new SimpleProduct("Banana", id2, 200));
+        Product banana = new SimpleProduct("Banana", id2, 200);
+        productMap.put(id2, banana);
+        availableProducts.put(id2, banana);
 
         UUID id3 = UUID.randomUUID();
-        productMap.put(id3, new DiscountedProduct("Orange", id3, 250, 50));
+        Product orange = new DiscountedProduct("Orange", id3, 250, 50);
+        productMap.put(id3, orange);
+        availableProducts.put(id3, orange);
 
         UUID id4 = UUID.randomUUID();
-        productMap.put(id4, new SimpleProduct("Oreo", id4, 245));
+        Product oreo = new SimpleProduct("Oreo", id4, 245);
+        productMap.put(id4, oreo);
+        availableProducts.put(id4, oreo);
 
         UUID id5 = UUID.randomUUID();
-        productMap.put(id5, new DiscountedProduct("Grape", id5, 300, 25));
+        Product grape = new DiscountedProduct("Grape", id5, 300, 25);
+        productMap.put(id5, grape);
+        availableProducts.put(id5, grape);
 
         UUID id6 = UUID.randomUUID();
-        productMap.put(id6, new FixPriceProduct("Strawberry", id6));
+        Product strawberry = new FixPriceProduct("Strawberry", id6);
+        productMap.put(id6, strawberry);
+        availableProducts.put(id6, strawberry);
 
         UUID id7 = UUID.randomUUID();
-        productMap.put(id7, new SimpleProduct("MAD", id7, 1200));
+        Product mad = new SimpleProduct("MAD", id7, 1200);
+        productMap.put(id7, mad);
+        availableProducts.put(id7, mad);
 
         UUID id8 = UUID.randomUUID();
-        productMap.put(id8, new FixPriceProduct("New York Times", id8));
+        Product newYorkTimes = new FixPriceProduct("New York Times", id8);
+        productMap.put(id8, newYorkTimes);
+        availableProducts.put(id8, newYorkTimes);
 
         UUID id9 = UUID.randomUUID();
-        productMap.put(id9, new DiscountedProduct("Jacobs Monarch", id9, 580, 30));
+        Product jacobsMonarch = new DiscountedProduct("Jacobs Monarch", id9, 580, 30);
+        productMap.put(id9, jacobsMonarch);
+        availableProducts.put(id9, jacobsMonarch);
 
         UUID articleId1 = UUID.randomUUID();
         articleMap.put(articleId1, new Article("Alligators", "Alligators are large, crocodile-like...", articleId1));
@@ -77,5 +98,8 @@ public class StorageService {
         return result;
     }
 
+    public Optional<Product> getProductById(UUID id) {
+        return Optional.ofNullable(availableProducts.get(id));
+    }
 
 }
