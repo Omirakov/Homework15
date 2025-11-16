@@ -1,5 +1,6 @@
 package org.skypro.skyshop.controller;
 
+import org.skypro.skyshop.exception.NoSuchProductException;
 import org.skypro.skyshop.model.article.Article;
 import org.skypro.skyshop.model.basket.UserBasket;
 import org.skypro.skyshop.model.product.Product;
@@ -27,14 +28,23 @@ public class ShopController {
         this.basketService = basketService;
     }
 
-    @GetMapping("/shop/products")
+    @GetMapping("/shop/product")
     public List<Product> getAllProducts() {
         return new ArrayList<>(storageService.getProductMap().values());
     }
 
-    @GetMapping("/shop/articles")
+    @GetMapping("/shop/article")
     public List<Article> getAllArticles() {
         return new ArrayList<>(storageService.getArticleMap().values());
+    }
+
+    @GetMapping("/shop/product/{id}")
+    public Product getProductById(@PathVariable UUID id) {
+        Product product = storageService.getProductById(id);
+        if (product == null) {
+            throw new NoSuchProductException("Продукт с ID " + id + " не найден");
+        }
+        return product;
     }
 
     @GetMapping("/shop/search")
@@ -44,9 +54,9 @@ public class ShopController {
 
     @GetMapping("/shop/basket/{id}")
     public String addProduct(@PathVariable("id") UUID id) {
-        Product product = storageService.getProductById(id).orElse(null);
+        Product product = storageService.getProductById(id);
         if (product == null) {
-            return "Продукт с ID " + id + " не найден";
+            throw new NoSuchProductException("Product with id " + id + " not found");
         }
         basketService.addProductToBasket(id);
         return "Продукт успешно добавлен";
