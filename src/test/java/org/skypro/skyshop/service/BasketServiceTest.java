@@ -9,7 +9,9 @@ import org.skypro.skyshop.exception.NoSuchProductException;
 import org.skypro.skyshop.model.basket.BasketItem;
 import org.skypro.skyshop.model.basket.ProductBasket;
 import org.skypro.skyshop.model.basket.UserBasket;
-import org.skypro.skyshop.model.product.Product;
+import org.skypro.skyshop.model.product.DiscountedProduct;
+import org.skypro.skyshop.model.product.FixPriceProduct;
+import org.skypro.skyshop.model.product.SimpleProduct;
 
 import java.util.*;
 
@@ -27,40 +29,45 @@ class BasketServiceTest {
     @InjectMocks
     private BasketService basketService;
 
-    private final UUID productId = UUID.randomUUID();
-    private final UUID anotherProductId = UUID.randomUUID();
-    private Product product;
-    private Product anotherProduct;
+    private final UUID simpleProductId = UUID.randomUUID();
+    private final UUID discountedProductId = UUID.randomUUID();
+    private final UUID fixPriceProductId = UUID.randomUUID();
+
+    private SimpleProduct simpleProduct;
+    private DiscountedProduct discountedProduct;
+    private FixPriceProduct fixPriceProduct;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        product = new TestProduct("Test Product", productId, 100);
-        anotherProduct = new TestProduct("Another Product", anotherProductId, 250);
+
+        simpleProduct = new SimpleProduct("Simple Product", simpleProductId, 100);
+        discountedProduct = new DiscountedProduct("Discounted Product", discountedProductId, 200, 25);
+        fixPriceProduct = new FixPriceProduct("Fix Price Product", fixPriceProductId);
     }
 
     @Test
     void addProductToBasket_shouldCallStorageAndBasketExactlyOnce_whenProductExists() {
-        when(storageService.getProductById(productId)).thenReturn(product);
-        basketService.addProductToBasket(productId);
-        verify(storageService, times(1)).getProductById(productId);
-        verify(productBasket, times(1)).addProduct(productId);
+        when(storageService.getProductById(simpleProductId)).thenReturn(simpleProduct);
+        basketService.addProductToBasket(simpleProductId);
+        verify(storageService, times(1)).getProductById(simpleProductId);
+        verify(productBasket, times(1)).addProduct(simpleProductId);
     }
 
     @Test
     void addProductToBasket_shouldNotModifyBasketAndThrowException_whenProductNotFound() {
-        when(storageService.getProductById(productId)).thenThrow(NoSuchProductException.class);
-        assertThrows(NoSuchProductException.class, () -> basketService.addProductToBasket(productId));
-        verify(storageService, times(1)).getProductById(productId);
+        when(storageService.getProductById(simpleProductId)).thenThrow(NoSuchProductException.class);
+        assertThrows(NoSuchProductException.class, () -> basketService.addProductToBasket(simpleProductId));
+        verify(storageService, times(1)).getProductById(simpleProductId);
         verify(productBasket, never()).addProduct(any());
     }
 
     @Test
     void addProductToBasket_shouldIncrementBasketCountOnMultipleCalls() {
-        when(storageService.getProductById(productId)).thenReturn(product);
-        basketService.addProductToBasket(productId);
-        basketService.addProductToBasket(productId);
-        verify(productBasket, times(2)).addProduct(productId);
+        when(storageService.getProductById(simpleProductId)).thenReturn(simpleProduct);
+        basketService.addProductToBasket(simpleProductId);
+        basketService.addProductToBasket(simpleProductId);
+        verify(productBasket, times(2)).addProduct(simpleProductId);
     }
 
     @Test
@@ -75,38 +82,45 @@ class BasketServiceTest {
 
     @Test
     void getUserBasket_shouldReturnSingleItemWithCorrectTotal() {
-        when(productBasket.getBasket()).thenReturn(Map.of(productId, 3));
-        when(storageService.getProductById(productId)).thenReturn(product);
+        when(productBasket.getBasket()).thenReturn(Map.of(simpleProductId, 3));
+        when(storageService.getProductById(simpleProductId)).thenReturn(simpleProduct);
         UserBasket result = basketService.getUserBasket();
         assertNotNull(result);
         assertEquals(1, result.getItems().size());
         assertEquals(300, result.getTotal());
         BasketItem item = result.getItems().get(0);
-        assertEquals(product, item.getProduct());
+        assertEquals(simpleProduct, item.getProduct());
         assertEquals(3, item.getCount());
-        verify(storageService).getProductById(productId);
+        verify(storageService).getProductById(simpleProductId);
     }
 
     @Test
     void getUserBasket_shouldReturnMultipleItemsWithCorrectTotal() {
-        when(productBasket.getBasket()).thenReturn(Map.of(productId, 2, anotherProductId, 1));
-        when(storageService.getProductById(productId)).thenReturn(product);
-        when(storageService.getProductById(anotherProductId)).thenReturn(anotherProduct);
+        when(productBasket.getBasket()).thenReturn(Map.of(simpleProductId, 2, discountedProductId, 1, fixPriceProductId, 1));
+        when(storageService.getProductById(simpleProductId)).thenReturn(simpleProduct);
+        when(storageService.getProductById(discountedProductId)).thenReturn(discountedProduct);
+        when(storageService.getProductById(fixPriceProductId)).thenReturn(fixPriceProduct);
+
         UserBasket result = basketService.getUserBasket();
+
         assertNotNull(result);
-        assertEquals(2, result.getItems().size());
-        assertEquals(450, result.getTotal());
-        assertTrue(result.getItems().stream().anyMatch(i -> i.getProduct().getId().equals(productId) && i.getCount() == 2));
-        assertTrue(result.getItems().stream().anyMatch(i -> i.getProduct().getId().equals(anotherProductId) && i.getCount() == 1));
+        assertEquals(3, result.getItems().size());
+        assertEquals(450, result.getTotal()); // 2*100 + 150 + 100
+
+        assertTrue(result.getItems().stream().anyMatch(i -> i.getProduct().getId().equals(simpleProductId) && i.getCount() == 2));
+        assertTrue(result.getItems().stream().anyMatch(i -> i.getProduct().getId().equals(discountedProductId) && i.getCount() == 1));
+        assertTrue(result.getItems().stream().anyMatch(i -> i.getProduct().getId().equals(fixPriceProductId) && i.getCount() == 1));
     }
 
     @Test
     void getUserBasket_shouldThrowExceptionIfAnyProductIsNotFound() {
         UUID missingId = UUID.randomUUID();
-        when(productBasket.getBasket()).thenReturn(Map.of(productId, 1, missingId, 1));
-        when(storageService.getProductById(productId)).thenReturn(product);
+        when(productBasket.getBasket()).thenReturn(Map.of(simpleProductId, 1, missingId, 1));
+        when(storageService.getProductById(simpleProductId)).thenReturn(simpleProduct);
         when(storageService.getProductById(missingId)).thenThrow(NoSuchProductException.class);
+
         assertThrows(NoSuchProductException.class, () -> basketService.getUserBasket());
+
         verify(storageService, times(2)).getProductById(any());
         verify(productBasket).getBasket();
     }
@@ -114,33 +128,20 @@ class BasketServiceTest {
     @Test
     void getUserBasket_shouldPreserveInsertionOrder() {
         Map<UUID, Integer> basketMap = new LinkedHashMap<>();
-        basketMap.put(anotherProductId, 1);
-        basketMap.put(productId, 1);
+        basketMap.put(discountedProductId, 1);
+        basketMap.put(simpleProductId, 1);
+        basketMap.put(fixPriceProductId, 1);
+
         when(productBasket.getBasket()).thenReturn(basketMap);
-        when(storageService.getProductById(productId)).thenReturn(product);
-        when(storageService.getProductById(anotherProductId)).thenReturn(anotherProduct);
+        when(storageService.getProductById(simpleProductId)).thenReturn(simpleProduct);
+        when(storageService.getProductById(discountedProductId)).thenReturn(discountedProduct);
+        when(storageService.getProductById(fixPriceProductId)).thenReturn(fixPriceProduct);
+
         UserBasket result = basketService.getUserBasket();
         List<BasketItem> items = result.getItems();
-        assertEquals(anotherProductId, items.get(0).getProduct().getId());
-        assertEquals(productId, items.get(1).getProduct().getId());
-    }
 
-    private static class TestProduct extends Product {
-        private final int price;
-
-        public TestProduct(String name, UUID id, int price) {
-            super(name, id);
-            this.price = price;
-        }
-
-        @Override
-        public int getPrice() {
-            return price;
-        }
-
-        @Override
-        public boolean isSpecial() {
-            return false;
-        }
+        assertEquals(discountedProductId, items.get(0).getProduct().getId());
+        assertEquals(simpleProductId, items.get(1).getProduct().getId());
+        assertEquals(fixPriceProductId, items.get(2).getProduct().getId());
     }
 }
